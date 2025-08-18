@@ -9,6 +9,7 @@ from .dapp import Dapp
 from .embark import Embark
 from .etherlime import Etherlime
 from .etherscan import Etherscan
+from .blockvision import BlockVision
 from .hardhat import Hardhat
 from .solc import Solc
 from .solc_standard_json import SolcStandardJson

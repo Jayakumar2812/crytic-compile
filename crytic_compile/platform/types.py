@@ -17,6 +17,7 @@ class Type(IntEnum):
     DAPP = 4
     ETHERLIME = 5
     ETHERSCAN = 6
+    BLOCKVISION = 13
     VYPER = 7
     WAFFLE = 8
     BROWNIE = 9
@@ -51,6 +52,8 @@ class Type(IntEnum):
             return "Etherlime"
         if self == Type.ETHERSCAN:
             return "Etherscan"
+        if self == Type.BLOCKVISION:
+            return "BlockVision"
         if self == Type.STANDARD:
             return "Standard"
         if self == Type.ARCHIVE:

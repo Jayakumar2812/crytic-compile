@@ -105,6 +105,7 @@ def _configure_solc(solc_requested: str, offline: bool) -> str:
         else:
             # Respect foundry offline option and skip installation.
             if not offline:
+                print("install_artifacts , solc_version",solc_version)
                 install_artifacts([solc_version])
             solc_path = artifact_path(solc_version)
     return solc_path.absolute().as_posix()

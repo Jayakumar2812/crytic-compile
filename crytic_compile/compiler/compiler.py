@@ -44,4 +44,5 @@ class CompilerVersion:
         if self.version not in installed_versions():
             # TODO: check that the solc version was installed.
             # Blocked by https://github.com/crytic/solc-select/issues/143
+            print("look_for_installed_version , self.version",self.version)
             install_artifacts([self.version])
