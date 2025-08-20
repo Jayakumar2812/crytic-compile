@@ -210,13 +210,13 @@ class BlockVision(AbstractPlatform):
                                 r = rr
                                 break
                 # Print raw API response for debugging/visibility
-                try:
-                    print(r.text)
-                except Exception:  # pragma: no cover
-                    try:
-                        print(r.content.decode("utf-8", errors="replace"))
-                    except Exception:
-                        pass
+                # try:
+                #     print(r.text)
+                # except Exception:  # pragma: no cover
+                #     try:
+                #         print(r.content.decode("utf-8", errors="replace"))
+                #     except Exception:
+                #         pass
 
                 if not r.ok:
                     raise InvalidCompilation(
@@ -256,10 +256,10 @@ class BlockVision(AbstractPlatform):
                     payload = retry_payload
 
                 # Print raw API response for debugging/visibility
-                try:
-                    print(payload.decode("utf-8", errors="replace"))
-                except Exception:  # pragma: no cover
-                    pass
+                # try:
+                #     print(payload.decode("utf-8", errors="replace"))
+                # except Exception:  # pragma: no cover
+                #     pass
 
             try:
                 info = json.loads(payload)
@@ -398,7 +398,7 @@ class BlockVision(AbstractPlatform):
             if isinstance(comp, dict) and isinstance(comp.get("version"), str):
                 m = re.findall(r"\d+\.\d+\.\d+", comp["version"]) or []
                 compiler_version = m[0] if m else None
-            print("compiler_version ------------",compiler_version)
+            # print("compiler_version ------------",compiler_version)
         if not has_sources and not only_source:
             LOGGER.info("Source code not available from BlockVision, try bytecode-only scrape")
             req = urllib.request.Request(bytecode_url, headers={"User-Agent": "Mozilla/5.0"})
@@ -433,7 +433,7 @@ class BlockVision(AbstractPlatform):
                     optimize_runs = int(result["Runs"])  # type: ignore[arg-type]
                 except Exception:  # pragma: no cover - defensive
                     optimize_runs = None
-        print("compiler_version ------------",compiler_version)
+        # print("compiler_version ------------",compiler_version)
         # Using the normalized dict_source_code generated above from BlockVision response
         if 'dict_source_code' not in locals():  # safety in case of early return
             LOGGER.error("Internal error: missing normalized sources")
