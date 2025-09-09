@@ -233,6 +233,7 @@ class BlockVision(AbstractPlatform):
                 try:
                     payload = _do_request(source_req)
                 except urllib.error.HTTPError as e:  # surface API error details and retry with query apikey
+                    print("HTTPError -------------", e)
                     retry_payload = None
                     if blockvision_api_key and e.code in (401, 403):
                         for key_name in ("apikey", "apiKey", "x-api-key"):
