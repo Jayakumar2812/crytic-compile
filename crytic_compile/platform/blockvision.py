@@ -193,7 +193,10 @@ class BlockVision(AbstractPlatform):
             if _HAS_REQUESTS:
                 # Primary path using requests (works in user's environment)
                 try:
+                    print(f"[BlockVision] GET ----------------------- {source_url} headers={common_headers}")
                     r = requests.get(source_url, headers=common_headers, timeout=25)
+                    print(f"[BlockVision]----------------------------- Sent URL={r.request.url} headers={dict(r.request.headers)} status={r.status_code}")
+                    # r = requests.get(source_url, headers=common_headers, timeout=25)
                 except Exception as e:  # pragma: no cover
                     raise InvalidCompilation(f"BlockVision network error: {e}") from e
                 if r.status_code == 403:
@@ -223,6 +226,7 @@ class BlockVision(AbstractPlatform):
                         f"BlockVision HTTP error {r.status_code}: {r.text}"
                     )
                 payload = r.content
+                print(f"[BlockVision]----------------------------- Payload={payload}")
             else:
                 # Fallback to urllib
                 source_req = urllib.request.Request(source_url, headers=common_headers)
@@ -306,14 +310,22 @@ class BlockVision(AbstractPlatform):
             # so relative imports (e.g., ../beacon/IBeacon.sol) resolve correctly.
             normalized_sources: Dict[str, Dict[str, str]] = {}
             path_hints: List[str] = []
+            metadata_sources: Dict[str, Dict[str, str]] = {}
             if isinstance(metadata_json, dict) and isinstance(metadata_json.get("sources"), dict):
-                path_hints = list(metadata_json.get("sources", {}).keys())
+                metadata_sources = metadata_json.get("sources", {})  # type: ignore[assignment]
+                path_hints = list(metadata_sources.keys())
 
-            # Build basename->possible paths map from metadata
+            # Build basename->possible paths map from metadata, including content for disambiguation
             basename_to_paths: Dict[str, List[str]] = {}
+            basename_to_path_and_content: Dict[str, List[Tuple[str, str]]] = {}
             for p in path_hints:
                 base = str(PurePosixPath(p).name).lower()
                 basename_to_paths.setdefault(base, []).append(p)
+                try:
+                    content_hint = str(metadata_sources.get(p, {}).get("content", ""))
+                except Exception:
+                    content_hint = ""
+                basename_to_path_and_content.setdefault(base, []).append((p, content_hint))
 
             for f in source_list:
                 try:
@@ -329,10 +341,16 @@ class BlockVision(AbstractPlatform):
                 name_path = raw_name.lstrip("/")
                 name_base = str(PurePosixPath(name_path).name).lower()
 
+                # 1) Exact path match from metadata
                 if name_path in path_hints:
                     candidate_path = name_path
-                elif name_base in basename_to_paths:
-                    # If there is a unique path ending with the given name, use it
+                # 2) Disambiguate by matching content against metadata.sources
+                if candidate_path is None and name_base in basename_to_path_and_content:
+                    matches_by_content = [p for (p, ch) in basename_to_path_and_content[name_base] if ch == content]
+                    if len(matches_by_content) == 1:
+                        candidate_path = matches_by_content[0]
+                # 3) Unique basename mapping
+                if candidate_path is None and name_base in basename_to_paths:
                     candidates = [p for p in basename_to_paths[name_base] if p.endswith("/" + str(PurePosixPath(name_path).name))]
                     if len(candidates) == 1:
                         candidate_path = candidates[0]
