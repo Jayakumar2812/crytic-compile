@@ -193,9 +193,7 @@ class BlockVision(AbstractPlatform):
             if _HAS_REQUESTS:
                 # Primary path using requests (works in user's environment)
                 try:
-                    print(f"[BlockVision] GET ----------------------- {source_url} headers={common_headers}")
                     r = requests.get(source_url, headers=common_headers, timeout=25)
-                    print(f"[BlockVision]----------------------------- Sent URL={r.request.url} headers={dict(r.request.headers)} status={r.status_code}")
                     # r = requests.get(source_url, headers=common_headers, timeout=25)
                 except Exception as e:  # pragma: no cover
                     raise InvalidCompilation(f"BlockVision network error: {e}") from e
@@ -226,7 +224,6 @@ class BlockVision(AbstractPlatform):
                         f"BlockVision HTTP error {r.status_code}: {r.text}"
                     )
                 payload = r.content
-                print(f"[BlockVision]----------------------------- Payload={payload}")
             else:
                 # Fallback to urllib
                 source_req = urllib.request.Request(source_url, headers=common_headers)
@@ -237,7 +234,6 @@ class BlockVision(AbstractPlatform):
                 try:
                     payload = _do_request(source_req)
                 except urllib.error.HTTPError as e:  # surface API error details and retry with query apikey
-                    print("HTTPError -------------", e)
                     retry_payload = None
                     if blockvision_api_key and e.code in (401, 403):
                         for key_name in ("apikey", "apiKey", "x-api-key"):
@@ -417,7 +413,6 @@ class BlockVision(AbstractPlatform):
             if isinstance(comp, dict) and isinstance(comp.get("version"), str):
                 m = re.findall(r"\d+\.\d+\.\d+", comp["version"]) or []
                 compiler_version = m[0] if m else None
-            # print("compiler_version ------------",compiler_version)
         if not has_sources and not only_source:
             LOGGER.info("Source code not available from BlockVision, try bytecode-only scrape")
             req = urllib.request.Request(bytecode_url, headers={"User-Agent": "Mozilla/5.0"})
@@ -452,7 +447,6 @@ class BlockVision(AbstractPlatform):
                     optimize_runs = int(result["Runs"])  # type: ignore[arg-type]
                 except Exception:  # pragma: no cover - defensive
                     optimize_runs = None
-        # print("compiler_version ------------",compiler_version)
         # Using the normalized dict_source_code generated above from BlockVision response
         if 'dict_source_code' not in locals():  # safety in case of early return
             LOGGER.error("Internal error: missing normalized sources")
