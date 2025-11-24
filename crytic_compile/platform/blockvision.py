@@ -40,7 +40,6 @@ except Exception:  # pragma: no cover
 # Base API per docs: https://docs.blockvision.org/reference/retrieve-contract-source-code
 # GET https://api.blockvision.org/v2/monad/contract/source/code?address=<addr>
 BLOCKVISION_BASE_SOURCE = "https://api.blockvision.org/v2/%s/contract/source/code?address=%s"
-
 # For explorer page scraping (bytecode fallback). Adjust hosts if/when needed.
 BLOCKVISION_BASE_BYTECODE = "https://%s/address/%s#code"
 
@@ -51,6 +50,8 @@ BLOCKVISION_BASE_BYTECODE = "https://%s/address/%s#code"
 SUPPORTED_NETWORK: Dict[str, Tuple[str, str]] = {
     # Monad testnet example
     "blockvision.testnet.monad": ("monad", "testnet.monadscan.com"),
+    # Monad mainnet
+    "blockvision.mainnet.monad": ("monad", "monadscan.com"),
 }
 
 

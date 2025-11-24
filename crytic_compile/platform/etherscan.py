@@ -113,6 +113,7 @@ SUPPORTED_NETWORK_V2: Dict[str, Tuple[str, str]] = {
     "sepolia.abstract": ("11124", "sepolia.abscan.org"),
     "berachain": ("80094", "berascan.com"),
     "testnet.monad": ("10143", "testnet.monadscan.com"),
+    "monad": ("143", "monadscan.com"),
 
 }
 
